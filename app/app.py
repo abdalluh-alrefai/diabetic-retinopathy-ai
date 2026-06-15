@@ -7,7 +7,6 @@ from PIL import Image, ImageFilter
 from scipy.ndimage import gaussian_filter
 
 IMG_SIZE = 300
-CKPT_PATH = "checkpoints/best_b3_fp16.pt"
 MODEL_NAME = "efficientnet_b3"
 CLASS_NAMES = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
@@ -40,14 +39,18 @@ def to_tensor(rgb_uint8):
 
 @st.cache_resource
 def load_model():
-    import os
+    import glob
     model = timm.create_model(MODEL_NAME, pretrained=False, num_classes=5)
-    if os.path.exists(CKPT_PATH):
-        ckpt = torch.load(CKPT_PATH, map_location="cpu")
-        state = ckpt["model"] if isinstance(ckpt, dict) and "model" in ckpt else ckpt
-        state = {k: v.float() for k, v in state.items()}
-        model.load_state_dict(state)
+    ckpts = sorted(glob.glob("checkpoints/*.pt"))
+    if not ckpts:
+        st.error("❌ No model checkpoint (.pt) found in the checkpoints/ folder.")
+        st.stop()
+    ckpt = torch.load(ckpts[0], map_location="cpu")
+    state = ckpt["model"] if isinstance(ckpt, dict) and "model" in ckpt else ckpt
+    state = {k: v.float() for k, v in state.items()}
+    model.load_state_dict(state)
     model.eval()
+    st.caption(f"✅ Loaded weights: {ckpts[0]}")
     return model
 
 
