@@ -7,7 +7,7 @@ from PIL import Image, ImageFilter
 from scipy.ndimage import gaussian_filter
 
 IMG_SIZE = 300
-CKPT_PATH = "checkpoints/best_b3.pt"
+CKPT_PATH = "checkpoints/best_b3_fp16.pt"
 MODEL_NAME = "efficientnet_b3"
 CLASS_NAMES = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
 MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
