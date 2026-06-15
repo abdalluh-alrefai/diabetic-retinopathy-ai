@@ -1,0 +1,39 @@
+# =====================================================
+# Configuration for Diabetic Retinopathy Detection
+# =====================================================
+
+data:
+  csv_path: "data/train.csv"          # columns: id_code, diagnosis
+  images_dir: "data/train_images"     # folder of .png/.jpg fundus images
+  image_ext: ".png"
+  image_size: 300                     # matches the trained EfficientNet-B3 model
+  val_split: 0.15
+  num_classes: 5                      # 0=No DR, 1=Mild, 2=Moderate, 3=Severe, 4=Proliferative
+
+model:
+  name: "efficientnet_b3"             # final model (balanced sampling + Focal Loss)
+  pretrained: true
+  drop_rate: 0.4
+
+train:
+  epochs: 25
+  batch_size: 16
+  lr: 0.0003
+  weight_decay: 0.00001
+  num_workers: 2
+  mixed_precision: true               # AMP for faster GPU training
+  early_stop_patience: 5
+  seed: 42
+  # quadratic weighted kappa is the official APTOS metric
+  monitor_metric: "qwk"
+
+paths:
+  checkpoints: "checkpoints"
+  outputs: "outputs"
+
+class_names:
+  - "No DR"
+  - "Mild"
+  - "Moderate"
+  - "Severe"
+  - "Proliferative DR"
